@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, ScrollView, Button } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
+import { Picker } from '@react-native-picker/picker';
 
 export default function TicketDetailScreen() {
   const { id } = useLocalSearchParams();
   const [ticket, setTicket] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [status, setStatus] = useState('');
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (!id || typeof id !== 'string') return;
@@ -18,7 +21,9 @@ export default function TicketDetailScreen() {
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
-          setTicket({ id: docSnap.id, ...docSnap.data() });
+          const data = docSnap.data();
+          setTicket({ id: docSnap.id, ...data });
+          setStatus(data.status);
         } else {
           setTicket(null);
         }
@@ -31,6 +36,23 @@ export default function TicketDetailScreen() {
 
     fetchTicket();
   }, [id]);
+
+  const handleUpdateStatus = async () => {
+    if (!ticket || ticket.status === status) return;
+    try {
+      setSaving(true);
+      const ref = doc(db, 'tickets', ticket.id);
+      await updateDoc(ref, {
+        status,
+        updatedAt: serverTimestamp()
+      });
+      setTicket((prev: any) => ({ ...prev, status }));
+    } catch (err) {
+      console.error('Erreur mise à jour du statut :', err);
+    } finally {
+      setSaving(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -48,10 +70,27 @@ export default function TicketDetailScreen() {
     );
   }
 
+  const hasStatusChanged = status !== ticket.status;
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>{ticket.title}</Text>
-      <Text style={styles.label}>Statut : <Text style={styles.value}>{ticket.status}</Text></Text>
+
+      <Text style={styles.label}>Modifier le statut :</Text>
+      <View style={styles.pickerWrapper}>
+        <Picker selectedValue={status} onValueChange={(value) => setStatus(value)}>
+          <Picker.Item label="Nouveau" value="new" />
+          <Picker.Item label="Assigné" value="assigned" />
+          <Picker.Item label="En cours" value="in-progress" />
+          <Picker.Item label="Résolu" value="resolved" />
+          <Picker.Item label="Clôturé" value="closed" />
+        </Picker>
+      </View>
+
+      {hasStatusChanged && (
+        <Button title={saving ? 'Mise à jour' : 'Enregistrer'} onPress={handleUpdateStatus} disabled={saving} />
+      )}
+
       <Text style={styles.label}>Priorité : <Text style={styles.value}>{ticket.priority}</Text></Text>
       <Text style={styles.label}>Catégorie : <Text style={styles.value}>{ticket.category}</Text></Text>
       <Text style={styles.label}>Description :</Text>
@@ -97,5 +136,11 @@ const styles = StyleSheet.create({
   error: {
     fontSize: 16,
     color: 'red'
+  },
+  pickerWrapper: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    marginBottom: 15
   }
 });
