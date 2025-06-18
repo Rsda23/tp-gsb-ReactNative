@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, FlatList, ActivityIndicator, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
 import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 
-export default function TicketListScreen() 
-{
+export default function TicketListScreen() {
   const router = useRouter();
   const [tickets, setTickets] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -29,12 +28,14 @@ export default function TicketListScreen()
         <ActivityIndicator size="large" color="#000" />
       ) : (
         <FlatList
-          data={tickets} keyExtractor={(item) => item.id} renderItem={({ item }) => (
-            <View style={styles.ticketCard}>
+          data={tickets}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <Pressable onPress={() => router.push(`/tickets/${item.id}`)} style={styles.ticketCard}>
               <Text style={styles.ticketTitle}>{item.title}</Text>
               <Text style={styles.meta}>Statut: {item.status}</Text>
               <Text style={styles.meta}>Priorité: {item.priority}</Text>
-            </View>
+            </Pressable>
           )}
         />
       )}
@@ -43,32 +44,27 @@ export default function TicketListScreen()
 }
 
 const styles = StyleSheet.create({
-  container: 
-  {
+  container: {
     flex: 1,
     padding: 20,
     backgroundColor: '#fff'
   },
-  title: 
-  {
+  title: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20
   },
-  ticketCard: 
-  {
+  ticketCard: {
     padding: 16,
     backgroundColor: '#f3f4f6',
     borderRadius: 8,
     marginBottom: 12
   },
-  ticketTitle: 
-  {
+  ticketTitle: {
     fontSize: 18,
     fontWeight: 'bold'
   },
-  meta: 
-  {
+  meta: {
     fontSize: 14,
     color: '#555'
   }
