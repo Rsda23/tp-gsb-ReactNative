@@ -28,6 +28,7 @@ export default function TabLayout() {
       <Tabs.Screen name="tickets/index" options={{ title: 'Mes Tickets', tabBarIcon: ({ color }) => <TabBarIcon name="list" color={color} />,}}/>
       <Tabs.Screen name="tickets/create" options={{ title: 'Créer', tabBarIcon: ({ color }) => <TabBarIcon name="plus" color={color} />,}}/>
       <Tabs.Screen name="profile" options={{ title: 'Profil', tabBarIcon: ({ color }) => <TabBarIcon name="user" color={color} />, }}/>
+      <Tabs.Screen name="tickets/[id]" options={{ href: null }} />
     </Tabs>
   );
 }
