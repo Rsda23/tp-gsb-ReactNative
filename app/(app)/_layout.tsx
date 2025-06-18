@@ -24,21 +24,10 @@ export default function TabLayout() {
 
         headerShown: useClientOnlyValue(false, true),
       }}>
-      <Tabs.Screen name="index" options={{ title: 'Tab One',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
-          headerRight: () => (
-            <Link href="/modal" asChild>
-              <Pressable>
-                {({ pressed }) => (
-                  <FontAwesome name="info-circle" size={25} color={Colors[colorScheme ?? 'light'].text}
-                    style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                  />
-                )}
-              </Pressable>
-            </Link>
-          ),
-        }}
-      />
+      <Tabs.Screen name="index" options={{ title: 'Accueil', tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,}}/>
+      <Tabs.Screen name="tickets/index" options={{ title: 'Mes Tickets', tabBarIcon: ({ color }) => <TabBarIcon name="list" color={color} />,}}/>
+      <Tabs.Screen name="tickets/create" options={{ title: 'Créer', tabBarIcon: ({ color }) => <TabBarIcon name="plus" color={color} />,}}/>
+      <Tabs.Screen name="profile" options={{ title: 'Profil', tabBarIcon: ({ color }) => <TabBarIcon name="user" color={color} />, }}/>
     </Tabs>
   );
 }
