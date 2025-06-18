@@ -1,19 +1,9 @@
 import { StyleSheet, Button } from 'react-native';
 import { useRouter } from 'expo-router';
-import { logout } from '../../lib/auth';
 import { Text, View } from '../../components/Themed';
 
 export default function HomeScreen() {
   const router = useRouter();
-
-  const handleLogout = async () => {
-    try {
-      await logout();
-      router.push('/auth/login');
-    } catch (err) {
-      console.error('Erreur de déconnexion :', err);
-    }
-  };
 
   return (
     <View style={styles.container}>
@@ -30,10 +20,6 @@ export default function HomeScreen() {
 
       <View style={styles.button}>
         <Button title="Mon profil" onPress={() => router.push('/profile')} />
-      </View>
-
-      <View style={styles.button}>
-        <Button title="Se déconnecter" onPress={handleLogout} color="#c0392b" />
       </View>
     </View>
   );
